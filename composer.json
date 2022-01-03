@@ -1,0 +1,11 @@
+{
+	"name": "ocdladefense/mw-sphinx-fulltext-search",
+    "description": "",
+    "type": "wordpress-theme",
+    "config": {
+        "preferred-install": {
+            "ocdladefense/*": "source"
+        }
+    },
+    "require": {}
+}
