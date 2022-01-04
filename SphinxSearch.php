@@ -23,9 +23,11 @@ $dir = dirname( __FILE__ ) . '/';
 
 
 $wgAutoloadClasses[ 'SphinxSearchEngine' ] = $dir . 'classes/SphinxSearchEngine.php';
+$wgAutoloadClasses[ 'SphinxTextSnippet' ] = $dir . 'classes/SphinxTextSnippet.php';
 $wgAutoloadClasses[ 'SphinxAdvancedSearchEngine' ] = $dir . 'classes/SphinxAdvancedSearchEngine.php';
 $wgAutoloadClasses[ 'SphinxSearchResultSet' ] = $dir . 'classes/SphinxSearchResultSet.php';
-$wgAutoloadClasses[ 'SphinxSearchResult' ] = $dir . 'classes/SphinxSearchResult.php';
+$wgAutoloadClasses[ 'SearchResultDefaultHighlighter' ] = $dir . 'classes/SearchResultDefaultHighlighter.php';
+$wgAutoloadClasses[ 'SearchResultSphinxHighlighter' ] = $dir . 'classes/SearchResultSphinxHighlighter.php';
 $wgAutoloadClasses[ 'SphinxSearchSampleResponse' ] = $dir . 'classes/SphinxSearchSampleResponse.php';
 $wgExtensionMessagesFiles['SphinxSearch'] = $dir . 'SphinxSearch.i18n.php';
 // $wgExtensionFunctions[ ] = 'efSphinxSearchPrefixSetup';
