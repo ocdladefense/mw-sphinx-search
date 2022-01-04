@@ -27,6 +27,7 @@ class SphinxSearchEngine extends SearchEngine {
 
 	// Whether to use sample results in SphinxSearchSampleResponse.
 	// If true, the search query will be constructed but not sent to Sphinx.
+	// The sample SphinxSearch result will be returned instead.
 	static $USE_TEST_RESULTS = false;
 
 
