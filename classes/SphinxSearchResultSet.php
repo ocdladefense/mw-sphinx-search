@@ -3,17 +3,15 @@
 
 class SphinxSearchResultSet extends SearchResultSet {
 
-	var $db;
-	
-	var $sphinx_client;
-
 	var $mNdx = 0;
 
 	var $mSuggestion = '';
 
 	var $total_hits = 0;
 
-	// var $mResultSet = array();
+	static $snippetUtility = null;
+
+	var $mResultSet = array();
 
 
 	/**
@@ -25,9 +23,12 @@ class SphinxSearchResultSet extends SearchResultSet {
 	function __construct( $resultSet, $total_hits, $terms, $sphinx_client, $dbr ) {
 		// ar_dump($resultSet); exit;
 
-		global $wgSearchHighlightBoundaries;
+		global $wgSearchHighlightBoundaries, $wgSphinxSearch_index;
 
-		$this->sphinx_client = $sphinx_client;
+		$snippet = new SphinxTextSnippet($wgSphinxSearch_index); //, $excerpts_opt);
+		$snippet->setClient($sphinx_client);
+		self::$snippetUtility = $snippet;
+
 		$this->mResultSet = $resultSet; //@jbernal
 
 		$this->total_hits = $total_hits;
@@ -42,11 +43,22 @@ class SphinxSearchResultSet extends SearchResultSet {
 	 * @return SphinxSearchResult: next result, false if none
 	 */
 	function next() {
+		global $wgSphinxSearchMWHighlighter;
+
 		if ( isset( $this->mResultSet[$this->mNdx] ) ) {
 			$row = $this->mResultSet[$this->mNdx];
 			++$this->mNdx;
-			return new SphinxSearchResult( $row, $this->sphinx_client );
+
+			if($wgSphinxSearchMWHighlighter) {
+				$result = new SearchResultDefaultHighlighter($row);
+			} else {
+				$result = new SearchResultSphinxHighlighter($row);
+				$result->setSnippetUtility(self::$snippetUtility);
+			}
+			
+			return $result;
 		} else {
+
 			return false;
 		}
 	}
