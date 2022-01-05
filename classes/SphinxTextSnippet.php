@@ -37,15 +37,12 @@ class SphinxTextSnippet {
 
 
 
-	public function setClient($client) {
-		$this->client = $client;
-	}
-
-
 
 	public function getExcerpts($text, $terms, $index = null) {
 
-		$excerpts = $this->client->BuildExcerpts(
+		$client = SphinxSearchEngine::getClient();
+
+		$excerpts = $client->BuildExcerpts(
 			array( $text ),
 			$this->index,
 			join( ' ', $terms ),
@@ -74,7 +71,7 @@ class SphinxTextSnippet {
 				$ret .= "<div style='margin: 0.2em 1em 0.2em 1em;'>$entry</div>\n";
 			}
 		} else {
-			$ret = wfMsg( 'internalerror_info', $this->client->GetLastError() );
+			$ret = wfMsg( 'internalerror_info', $client->GetLastError() );
 		}
 		
 		return $ret;

@@ -9,9 +9,9 @@ class SphinxSearchResultSet extends SearchResultSet {
 
 	var $total_hits = 0;
 
-	static $snippetUtility = null;
-
 	var $mResultSet = array();
+
+
 
 
 	/**
@@ -20,14 +20,12 @@ class SphinxSearchResultSet extends SearchResultSet {
 	 * Creates an array of MediaWiki rows using the doc ids from
 	 *  the SphinxSearch query.
 	 */
-	function __construct( $resultSet, $total_hits, $terms, $sphinx_client, $dbr ) {
+	function __construct( $resultSet, $total_hits, $terms, $dbr ) {
 		// ar_dump($resultSet); exit;
 
 		global $wgSearchHighlightBoundaries, $wgSphinxSearch_index;
 
-		$snippet = new SphinxTextSnippet($wgSphinxSearch_index); //, $excerpts_opt);
-		$snippet->setClient($sphinx_client);
-		self::$snippetUtility = $snippet;
+
 
 		$this->mResultSet = $resultSet; //@jbernal
 
@@ -53,7 +51,6 @@ class SphinxSearchResultSet extends SearchResultSet {
 				$result = new SearchResultDefaultHighlighter($row);
 			} else {
 				$result = new SearchResultSphinxHighlighter($row);
-				$result->setSnippetUtility(self::$snippetUtility);
 			}
 			
 			return $result;

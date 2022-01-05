@@ -5,21 +5,13 @@
 
 class SearchResultSphinxHighlighter extends SearchResult {
 
-	static $snippet = null;
-
-
-
 
 	public function __construct( $row ) {
 
 		parent::__construct( $row );
 	}
 
-	public function setSnippetUtility($util) {
-		if(self::$snippet == null) {
-			self::$snippet = $util;
-		}
-	}
+
 
 	/**
 	 * Emulates SearchResult getTextSnippet so that we can use our own userHighlightPrefs
@@ -32,7 +24,7 @@ class SearchResultSphinxHighlighter extends SearchResult {
 	
 		// list( $contextlines, $contextchars ) = SphinxSearchEngine::userHighlightPrefs( $wgUser );
 		$this->initText();
-		return self::$snippet->getExcerpts($this->mText, $terms);
+		return SphinxSearchEngine::getSnippetFactory()->getExcerpts($this->mText, $terms);
 	}
 
 }

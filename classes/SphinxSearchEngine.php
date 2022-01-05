@@ -13,7 +13,9 @@ class SphinxSearchEngine extends SearchEngine {
 
 
 
-	protected $client = null;
+	private static $client = null;
+
+	private static $snippetFactory = null;
 
 	protected $categories = array();
 
@@ -29,6 +31,21 @@ class SphinxSearchEngine extends SearchEngine {
 	// If true, the search query will be constructed but not sent to Sphinx.
 	// The sample SphinxSearch result will be returned instead.
 	static $USE_TEST_RESULTS = false;
+
+
+	public static function getClient() {
+		return self::$client;
+	}
+
+	public static function getSnippetFactory() {
+		global $wgSphinxSearch_index;
+
+		if(null == self::$snippetFactory) {
+			self::$snippetFactory = new SphinxTextSnippet($wgSphinxSearch_index); //, $excerpts_opt);
+		}
+
+		return self::$snippetFactory;
+	}
 
 
 
@@ -57,7 +74,7 @@ class SphinxSearchEngine extends SearchEngine {
 		if ( $isEmptySearch === true && !$wgSphinxSuggestMode ) {
 			return null;
 		} else if($isEmptySearch === true){
-			return new SphinxSearchResultSet( array(), $term, $this->client, $this->db );
+			return new SphinxSearchResultSet( array(), 0, $term, $this->db );
 		}
 
 		
@@ -70,8 +87,11 @@ class SphinxSearchEngine extends SearchEngine {
 		) );
 		
 
-		$this->client = $this->prepareSphinxClient();
-		wfRunHooks( 'SphinxSearchBeforeQuery', array( &$term, &$this->client ) );
+		self::$client = $this->prepareSphinxClient();
+
+
+
+		wfRunHooks( 'SphinxSearchBeforeQuery', array( &$term, &self::$client ) );
 
 
 		$this->searchTerms = $term;
@@ -82,7 +102,7 @@ class SphinxSearchEngine extends SearchEngine {
 
 		// First query SphinxSearch to get our relevant docIds.
 		$sphinxResult = self::$USE_TEST_RESULTS ? SphinxSearchSampleResponse::$results : 
-			$this->client->Query($term,$wgSphinxSearch_index_list);
+			self::$client->Query($term,$wgSphinxSearch_index_list);
 
 
 		$docIds = array_keys($sphinxResult["matches"]);
@@ -95,7 +115,7 @@ class SphinxSearchEngine extends SearchEngine {
 
 		// var_dump($mResults);exit;
 
-		return new SphinxSearchResultSet( $mResults, $total_found, $term, $this->client, $this->db );
+		return new SphinxSearchResultSet( $mResults, $total_found, $term, $this->db );
 	}
 
 
@@ -105,17 +125,17 @@ class SphinxSearchEngine extends SearchEngine {
 	 * SphinxSearch will return a list of docIds corresponding to MediaWiki page_ids.
 	 * Use these docIds to load the corresponding MediaWiki pages.
 	 */
-	protected function loadMediaWikiPages($docIds) {
+	protected function loadMediaWikiPages($page_ids) {
 		
 		$mResultSet = array();
 
-		if(!is_array($docIds)) return array();
+		if(!is_array($page_ids)) return array();
 
 
 		// $this->total_hits = $resultSet[ 'total_found' ];
 
 		// foreach ( $resultSet['matches'] as $id => $docinfo ) { // Comment out b/c docInfo isn't being used.
-		foreach( $docIds as $page_id ) {
+		foreach( $page_ids as $page_id ) {
 			$res = $this->db->select(
 				'page',
 				array( 'page_id', 'page_title', 'page_namespace' ),
